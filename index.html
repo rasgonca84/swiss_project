@@ -3,88 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Swiss Map - Major Cities</title>
+    <title>Interactive Swiss Map - Major Cities</title>
     <style>
-        /* Container holds the map and markers responsive */
+        body {
+            background-color: #222; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
         .map-container {
             position: relative;
             display: inline-block;
             width: 100%;
-            max-width: 800px; /* Adjust max width as needed */
+            max-width: 900px; 
             font-family: Arial, sans-serif;
         }
 
-        /* The map image */
         .map-image {
             display: block;
             width: 100%;
             height: auto;
+            opacity: 0.7; 
+            transition: opacity 0.3s ease;
         }
 
-        /* Shared style for all city markers */
+        .map-container:hover .map-image {
+            opacity: 1.0;
+        }
+
         .city-marker {
             position: absolute;
-            width: 16px;
-            height: 16px;
-            background-color: #e74c3c; /* Red color */
+            width: 14px; 
+            height: 14px;
+            background-color: #e74c3c; 
             border: 2px solid white;
             border-radius: 50%;
-            transform: translate(-50%, -50%); /* Centers the dot on the coordinate */
+            transform: translate(-50%, -50%);
             cursor: pointer;
             box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-            transition: transform 0.2s ease;
+            transition: all 0.2s ease;
             z-index: 10;
         }
 
-        /* Hover effect to enlarge marker */
         .city-marker:hover {
-            transform: translate(-50%, -50%) scale(1.3);
-            background-color: #c0392b;
+            transform: translate(-50%, -50%) scale(1.5);
+            background-color: #ff3300;
             z-index: 20;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.6);
         }
 
-        /* Tooltip styling (the text label) */
         .city-marker::after {
-            content: attr(data-city); /* Pulls text from the HTML attribute */
+            content: attr(data-city);
             position: absolute;
-            bottom: 140%;
+            bottom: 150%; 
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             color: white;
-            padding: 4px 8px;
+            padding: 5px 10px;
             border-radius: 4px;
-            font-size: 12px;
+            font-size: 13px;
+            font-weight: bold;
             white-space: nowrap;
-            opacity: 0; /* Hidden by default */
+            opacity: 0; 
             pointer-events: none;
             transition: opacity 0.2s;
         }
 
-        /* Show tooltip on hover */
         .city-marker:hover::after {
             opacity: 1;
         }
 
-        /* --- Specific Coordinates for Each City --- */
+        /* --- FINAL COORDINATE ADJUSTMENTS --- */
         
-        /* Bern: Central/West ~46.95°N, 7.45°E */
-        .bern {
-            top: 43%;
-            left: 33%;
-        }
+        /* Bern: Central */
+        .bern { top: 44%; left: 32%; }
+        
+        /* Zurich: North Central */
+        .zurich { top: 30%; left: 54%; }
+        
+        /* Geneva: South West Tail */
+        .geneva { top: 75%; left: 13%; }
 
-        /* Zurich: North/East ~47.37°N, 8.54°E */
-        .zurich {
-            top: 25%;
-            left: 57%;
-        }
-
-        /* Geneva: Far South-West (The "Tail") ~46.20°N, 6.14°E */
-        .geneva {
-            top: 78%;
-            left: 8%;
-        }
+        /* Basel: Moved DOWN to clear top border */
+        .basel { top: 23%; left: 38%; }
+        
+        /* Lausanne: South West */
+        .lausanne { top: 66%; left: 24%; }
+        
+        /* Lucerne: Central */
+        .lucerne { top: 48%; left: 48%; }
+        
+        /* St. Gallen: North East */
+        .stgallen { top: 27%; left: 68%; }
+        
+        /* Lugano: Moved DOWN and slightly LEFT to fit the tip */
+        .lugano { top: 84%; left: 69%; }
 
     </style>
 </head>
@@ -93,9 +110,14 @@
     <div class="map-container">
         <img src="swiss-map.png" alt="Map of Switzerland" class="map-image">
         
-        <div class="city-marker bern" data-city="Bern"></div>
-        <div class="city-marker zurich" data-city="Zurich"></div>
-        <div class="city-marker geneva" data-city="Geneva"></div>
+        <div class="city-marker bern" data-city="Bern (Capital)"></div>
+        <div class="city-marker zurich" data-city="Zürich"></div>
+        <div class="city-marker geneva" data-city="Genève"></div>
+        <div class="city-marker basel" data-city="Basel"></div>
+        <div class="city-marker lausanne" data-city="Lausanne"></div>
+        <div class="city-marker lucerne" data-city="Luzern"></div>
+        <div class="city-marker stgallen" data-city="St. Gallen"></div>
+        <div class="city-marker lugano" data-city="Lugano"></div>
     </div>
 
 </body>
