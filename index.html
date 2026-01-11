@@ -3,373 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Swiss Atlas | Interactive Guide</title>
+    <title>Swiss Map - Major Cities</title>
     <style>
-        /* --- SWISS STYLE CSS --- */
-        :root {
-            --swiss-red: #D52B1E;
-            --black: #1A1A1A;
-            --white: #FFFFFF;
-            --gray: #F4F4F4;
-            --grid-gap: 20px;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-            background-color: var(--white);
-            color: var(--black);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        /* Header */
-        header {
-            background-color: var(--swiss-red);
-            color: var(--white);
-            padding: 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        h1 {
-            font-weight: 700;
-            letter-spacing: -1px;
-            font-size: 1.5rem;
-            text-transform: uppercase;
-        }
-
-        /* Hero Section */
-        .hero {
-            padding: 4rem 2rem 2rem 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .hero h2 {
-            font-size: 3rem;
-            max-width: 800px;
-            line-height: 1.1;
-            margin-bottom: 2rem;
-        }
-
-        /* --- NEW MAP SECTION --- */
-        .map-wrapper {
-            position: relative;
-            max-width: 900px;
-            margin: 0 auto 4rem auto;
-            border: 1px solid #ddd;
-            background: var(--gray);
-            padding: 2rem;
-        }
-
+        /* Container holds the map and markers responsive */
         .map-container {
             position: relative;
+            display: inline-block;
             width: 100%;
+            max-width: 800px; /* Adjust max width as needed */
+            font-family: Arial, sans-serif;
         }
 
+        /* The map image */
         .map-image {
+            display: block;
             width: 100%;
             height: auto;
-            display: block;
-            opacity: 0.9;
         }
 
-        /* City Markers (Dots) */
+        /* Shared style for all city markers */
         .city-marker {
             position: absolute;
-            display: flex;
-            align-items: center;
+            width: 16px;
+            height: 16px;
+            background-color: #e74c3c; /* Red color */
+            border: 2px solid white;
+            border-radius: 50%;
+            transform: translate(-50%, -50%); /* Centers the dot on the coordinate */
             cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
             transition: transform 0.2s ease;
-        }
-
-        .city-marker:hover {
-            transform: scale(1.2);
             z-index: 10;
         }
 
-        .dot {
-            width: 16px;
-            height: 16px;
-            background-color: var(--swiss-red);
-            border-radius: 50%;
-            border: 2px solid var(--white);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        /* Hover effect to enlarge marker */
+        .city-marker:hover {
+            transform: translate(-50%, -50%) scale(1.3);
+            background-color: #c0392b;
+            z-index: 20;
         }
 
-        .label {
-            background: var(--black);
-            color: var(--white);
+        /* Tooltip styling (the text label) */
+        .city-marker::after {
+            content: attr(data-city); /* Pulls text from the HTML attribute */
+            position: absolute;
+            bottom: 140%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
             padding: 4px 8px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            margin-left: 8px;
-            border-radius: 2px;
-            text-transform: uppercase;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0; /* Hidden by default */
+            pointer-events: none;
+            transition: opacity 0.2s;
         }
 
-        /* Grid Layout for Content */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            border-top: 2px solid var(--black);
+        /* Show tooltip on hover */
+        .city-marker:hover::after {
+            opacity: 1;
         }
 
-        .section-title {
-            font-size: 1.2rem;
-            text-transform: uppercase;
-            border-bottom: 1px solid var(--black);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            margin-top: 40px;
+        /* --- Specific Coordinates for Each City --- */
+        
+        /* Bern: Central/West ~46.95°N, 7.45°E */
+        .bern {
+            top: 43%;
+            left: 33%;
         }
 
-        /* Canton Cards */
-        .canton-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: var(--grid-gap);
+        /* Zurich: North/East ~47.37°N, 8.54°E */
+        .zurich {
+            top: 25%;
+            left: 57%;
         }
 
-        .canton-card {
-            background: var(--gray);
-            padding: 1.5rem;
-            cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
+        /* Geneva: Far South-West (The "Tail") ~46.20°N, 6.14°E */
+        .geneva {
+            top: 78%;
+            left: 8%;
         }
 
-        .canton-card:hover {
-            background: var(--white);
-            border: 1px solid var(--black);
-            transform: translateY(-5px);
-            box-shadow: 5px 5px 0px var(--black);
-        }
-
-        .canton-abbr {
-            font-size: 3rem;
-            font-weight: 900;
-            color: var(--swiss-red);
-            display: block;
-            margin-bottom: 10px;
-        }
-
-        /* Detail View */
-        #detail-view {
-            display: none;
-            background: var(--black);
-            color: var(--white);
-            padding: 2rem;
-            margin-top: 2rem;
-        }
-
-        #detail-view h3 {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-        }
-
-        /* Fact Generator */
-        .fact-box {
-            border: 4px solid var(--swiss-red);
-            padding: 2rem;
-            text-align: center;
-            margin-top: 2rem;
-        }
-
-        .btn {
-            background: var(--black);
-            color: var(--white);
-            border: none;
-            padding: 10px 20px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 1rem;
-            text-transform: uppercase;
-        }
-
-        .btn:hover {
-            background: var(--swiss-red);
-        }
-
-        footer {
-            text-align: center;
-            padding: 2rem;
-            margin-top: 4rem;
-            font-size: 0.8rem;
-            color: #666;
-            border-top: 1px solid #ddd;
-        }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>Swiss Atlas (+)</h1>
-        <nav>The Confederation</nav>
-    </header>
-
-    <div class="hero">
-        <h2>Small country.<br>Four languages.<br>Infinite variety.</h2>
-    </div>
-
-    <div class="map-wrapper">
-        <div class="map-container">
-            <img src="swiss-map.png" alt="Map of Switzerland" class="map-image">
-            
-            <div class="city-marker" style="top: 22%; left: 58%;" onclick="alert('Zurich: Largest city and financial hub.')">
-                <div class="dot"></div>
-                <span class="label">Zurich</span>
-            </div>
-
-            <div class="city-marker" style="top: 40%; left: 34%;" onclick="alert('Bern: The federal capital.')">
-                <div class="dot"></div>
-                <span class="label">Bern</span>
-            </div>
-
-            <div class="city-marker" style="top: 75%; left: 8%;" onclick="alert('Geneva: Center of diplomacy.')">
-                <div class="dot"></div>
-                <span class="label">Geneva</span>
-            </div>
-
-            <div class="city-marker" style="top: 6%; left: 33%;" onclick="alert('Basel: Pharmaceutical hub on the Rhine.')">
-                <div class="dot"></div>
-                <span class="label">Basel</span>
-            </div>
-
-            <div class="city-marker" style="top: 78%; left: 70%;" onclick="alert('Lugano: Italian speaking region.')">
-                <div class="dot"></div>
-                <span class="label">Lugano</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="container">
-        <div class="section-title">Explore the Cantons</div>
+    <div class="map-container">
+        <img src="swiss-map.png" alt="Map of Switzerland" class="map-image">
         
-        <div class="canton-grid" id="cantonGrid">
-            </div>
-
-        <div id="detail-view">
-            <h3 id="detail-name">Canton Name</h3>
-            <p><strong>Capital:</strong> <span id="detail-capital"></span></p>
-            <p><strong>Language:</strong> <span id="detail-lang"></span></p>
-            <p style="margin-top:1rem; font-style: italic;" id="detail-desc"></p>
-        </div>
-
-        <div class="section-title">Did you know?</div>
-        <div class="fact-box">
-            <h3 id="fact-display">Click the button to learn a Swiss secret...</h3>
-            <button class="btn" onclick="showRandomFact()">Generate Fact</button>
-        </div>
+        <div class="city-marker bern" data-city="Bern"></div>
+        <div class="city-marker zurich" data-city="Zurich"></div>
+        <div class="city-marker geneva" data-city="Geneva"></div>
     </div>
 
-    <footer>
-        <p>&copy; 2025 Swiss Atlas Project</p>
-    </footer>
-
-    <script>
-        // --- DATA ---
-        const cantons = [
-            {
-                name: "Zurich",
-                abbr: "ZH",
-                capital: "Zurich",
-                language: "German",
-                desc: "The financial engine of Switzerland. Known for banking, techno street parades, and expensive chocolate."
-            },
-            {
-                name: "Bern",
-                abbr: "BE",
-                capital: "Bern",
-                language: "German/French",
-                desc: "The federal capital. Einstein developed the Theory of Relativity here while working at the patent office."
-            },
-            {
-                name: "Geneva",
-                abbr: "GE",
-                capital: "Geneva",
-                language: "French",
-                desc: "The global hub. Home to the Red Cross, the UN, and the Jet d'Eau fountain."
-            },
-            {
-                name: "Ticino",
-                abbr: "TI",
-                capital: "Bellinzona",
-                language: "Italian",
-                desc: "The sunny south. Palm trees, piazzas, and Italian gelato with Swiss efficiency."
-            },
-            {
-                name: "Valais",
-                abbr: "VS",
-                capital: "Sion",
-                language: "French/German",
-                desc: "Home of the Matterhorn and vast vineyards. They eat Raclette here religiously."
-            },
-            {
-                name: "Graubünden",
-                abbr: "GR",
-                capital: "Chur",
-                language: "German/Romansh/Italian",
-                desc: "The only trilingual canton. Famous for St. Moritz ski resorts and untouched nature."
-            }
-        ];
-
-        const facts = [
-            "It is illegal to mow your lawn on Sundays in Switzerland due to noise pollution laws.",
-            "Switzerland has over 1,500 lakes. You are never more than 16 km away from a lake.",
-            "The Gotthard Base Tunnel is the longest rail tunnel in the world (57 km).",
-            "Switzerland is not in the EU, nor is it part of the EEA.",
-            "Swiss chocolate makers invented milk chocolate (Daniel Peter in 1875)."
-        ];
-
-        // --- FUNCTIONS ---
-
-        // 1. Render the Grid
-        const grid = document.getElementById('cantonGrid');
-        
-        cantons.forEach(canton => {
-            const card = document.createElement('div');
-            card.className = 'canton-card';
-            card.innerHTML = `
-                <span class="canton-abbr">${canton.abbr}</span>
-                <h4>${canton.name}</h4>
-            `;
-            // Add click event to show details
-            card.onclick = () => showDetail(canton);
-            grid.appendChild(card);
-        });
-
-        // 2. Show Detail View
-        function showDetail(canton) {
-            const detailView = document.getElementById('detail-view');
-            document.getElementById('detail-name').innerText = canton.name;
-            document.getElementById('detail-capital').innerText = canton.capital;
-            document.getElementById('detail-lang').innerText = canton.language;
-            document.getElementById('detail-desc').innerText = canton.desc;
-            
-            detailView.style.display = 'block';
-            
-            // Smooth scroll to details
-            detailView.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // 3. Random Fact Generator
-        function showRandomFact() {
-            const factDisplay = document.getElementById('fact-display');
-            const randomIndex = Math.floor(Math.random() * facts.length);
-            factDisplay.innerText = facts[randomIndex];
-        }
-    </script>
 </body>
 </html>
